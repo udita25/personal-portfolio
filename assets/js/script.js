@@ -115,24 +115,50 @@ for (let i = 0; i < filterBtn.length; i++) {
 
 
 
-// contact form variables
-const form = document.querySelector("[data-form]");
-const formInputs = document.querySelectorAll("[data-form-input]");
-const formBtn = document.querySelector("[data-form-btn]");
+// Contact form elements
+  const form = document.querySelector("[data-form]");
+  const formInputs = document.querySelectorAll("[data-form-input]");
+  const formBtn = document.querySelector("[data-form-btn]");
+  const responseDiv = document.getElementById("formResponse");
 
-// add event to all form input field
-for (let i = 0; i < formInputs.length; i++) {
-  formInputs[i].addEventListener("input", function () {
+  // Enable/disable button based on validation
+  for (let i = 0; i < formInputs.length; i++) {
+    formInputs[i].addEventListener("input", function () {
+      if (form.checkValidity()) {
+        formBtn.removeAttribute("disabled");
+      } else {
+        formBtn.setAttribute("disabled", "");
+      }
+    });
+  }
 
-    // check form validation
-    if (form.checkValidity()) {
-      formBtn.removeAttribute("disabled");
-    } else {
-      formBtn.setAttribute("disabled", "");
-    }
+  // Your Google Apps Script Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycby2RH0J1r8kiTRlotXTDr1WIxjQ64Ebzv3az1bVT3u_rgnqC1ucRpAo55Bm9WKgoi-dxA/exec";
+// AKfycby2RH0J1r8kiTRlotXTDr1WIxjQ64Ebzv3az1bVT3u_rgnqC1ucRpAo55Bm9WKgoi-dxA
+  // Handle form submission
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    formBtn.setAttribute("disabled", "");
+    responseDiv.style.color = "black";
+    responseDiv.textContent = "Sending...";
 
+    fetch(scriptURL, {
+      method: "POST",
+      body: new FormData(form),
+    })
+      .then((response) => {
+        responseDiv.style.color = "green";
+        responseDiv.textContent = "✓ Thanks for contacting us! We'll reach out soon.";
+        form.reset();
+        formBtn.setAttribute("disabled", "");
+      })
+      .catch((error) => {
+        console.error("Error!", error.message);
+        responseDiv.style.color = "red";
+        responseDiv.textContent = "✗ Oops! Something went wrong. Please try again.";
+        formBtn.removeAttribute("disabled");
+      });
   });
-}
 
 
 
